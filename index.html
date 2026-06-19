@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nettoday — Kom i gang</title>
+<!--
+  NOTE TIL SIMON: bekræft connector-URL'en før du deler.
+  Brugt her: https://nettoday.fastmcp.app/mcp  (README's "Live"-URL).
+  Den gamle guide brugte app.fastmcp.com/nettoday/mcp — kun ÉN er rigtig.
+  Søg på "CONNECTOR_URL" nedenfor for at rette ét sted.
+  PDF: åbn i browser → Print → Gem som PDF (print-styles giver lys baggrund).
+-->
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #161924;
+    --border: #2a2d3a;
+    --accent: #6c8fff;
+    --accent2: #7eeea0;
+    --text: #e8eaf0;
+    --muted: #8b8fa8;
+    --warn: #f5a623;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 2rem 1rem;
+  }
+  .wrapper { max-width: 760px; margin: 0 auto; }
+  header { text-align: center; padding: 3rem 0 2rem; }
+  header h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.5px; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); font-size: 1.05rem; margin-top: 0.6rem; }
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .lead {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-size: 1rem;
+  }
+  .lead strong { color: var(--text); }
+  .lead p { color: var(--muted); }
+  .lead p + p { margin-top: 0.6rem; }
+
+  /* mini table of contents */
+  .toc {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin: 1.5rem 0 0;
+    justify-content: center;
+  }
+  .toc a {
+    font-size: 0.82rem; color: var(--accent);
+    text-decoration: none; border: 1px solid var(--border);
+    background: var(--surface2);
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .toc a:hover { border-color: var(--accent); }
+
+  section { margin: 2.5rem 0; }
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  h3 { font-size: 1rem; font-weight: 600; margin: 1.2rem 0 0.5rem; color: var(--text); }
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card p { color: var(--muted); font-size: 0.95rem; }
+  .card p + p { margin-top: 0.5rem; }
+  .card strong { color: var(--text); }
+  code, .mono {
+    font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+    background: #252839;
+    color: var(--accent2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }
+  .cmd-block {
+    background: #252839;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
+    margin: 0.55rem 0;
+    font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+    font-size: 0.9rem;
+    color: var(--accent2);
+    white-space: pre-wrap;
+  }
+  .cmd-block.you::before {
+    content: "Du skriver:";
+    display: block;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+  .tip {
+    border-left: 3px solid var(--accent2);
+    padding-left: 1rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+  }
+  .tip strong { color: var(--accent2); }
+  .warn-box {
+    background: rgba(245,166,35,0.08);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    font-size: 0.9rem;
+    color: var(--warn);
+    margin: 1rem 0;
+  }
+  ul, ol { padding-left: 1.4rem; }
+  li { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.4rem; }
+  li strong { color: var(--text); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  /* example day table */
+  .daytable { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin-top: 0.5rem; }
+  .daytable th, .daytable td { padding: 0.4rem 0.6rem; text-align: right; border-bottom: 1px solid var(--border); }
+  .daytable th:first-child, .daytable td:first-child { text-align: left; }
+  .daytable thead th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .daytable .total td { font-weight: 700; color: var(--text); border-top: 2px solid var(--border); }
+  .daytable .motion td { color: var(--warn); }
+  .daytable .net td { font-weight: 700; color: var(--accent); }
+  .daytable .left td { font-weight: 700; color: var(--accent2); }
+  .caption { color: var(--muted); font-size: 0.82rem; margin-top: 0.5rem; }
+
+  /* method cards */
+  .methods { display: grid; gap: 0.75rem; }
+  .method {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.9rem 1.1rem;
+  }
+  .method .mname { color: var(--accent); font-weight: 600; font-size: 0.95rem; }
+  .method .mtag { color: var(--muted); font-size: 0.8rem; }
+  .method p { color: var(--muted); font-size: 0.88rem; margin-top: 0.35rem; }
+
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  @media (max-width: 560px) { .tool-grid { grid-template-columns: 1fr; } }
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+  .tool-card .tool-name { color: var(--accent2); font-family: ui-monospace, monospace; font-size: 0.82rem; font-weight: 600; }
+  .tool-card .tool-desc { color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem; }
+  .group-label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; margin: 1.2rem 0 0.5rem; }
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 4rem; padding-bottom: 2rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ---- PRINT / PDF: light, ink-friendly, no page-break inside cards ---- */
+  @media print {
+    :root {
+      --bg: #ffffff; --surface: #f7f8fa; --surface2: #f0f2f6;
+      --border: #d4d8e0; --text: #14161c; --muted: #4a4f5e;
+      --accent: #2d52d6; --accent2: #1f8f4e; --warn: #b9760a;
+    }
+    body { padding: 0; font-size: 11pt; line-height: 1.5; }
+    .toc, .warn-box.no-print { display: none; }
+    header { padding: 0.5rem 0 1rem; }
+    header h1 { font-size: 1.9rem; }
+    section { margin: 1.1rem 0; page-break-inside: avoid; }
+    .card, .method, .tool-card, .daytable { page-break-inside: avoid; }
+    code, .mono, .cmd-block { background: #eef0f4; color: #14161c; border-color: #d4d8e0; }
+    a { color: #2d52d6; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="badge">Velkommen-guide</div>
+    <h1>Kom i gang med <span>Nettoday</span></h1>
+    <p>En personlig kalorie- og sundhedstracker, der lever direkte i Claude.</p>
+    <nav class="toc">
+      <a href="#hvad">Hvad er det</a>
+      <a href="#opsaet">Opsætning</a>
+      <a href="#metoder">TDEE-metoder</a>
+      <a href="#feedback">Feedback (vigtigt)</a>
+      <a href="#dagligt">Daglig brug</a>
+      <a href="#tabel">Dagstabellen</a>
+      <a href="#raad">Gode råd</a>
+      <a href="#tools">Værktøjer</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </header>
+
+  <!-- What is it -->
+  <section id="hvad">
+    <div class="lead">
+      <p><strong>Hvad er Nettoday?</strong> Det er en lille udvidelse (en "connector") til Claude, der giver Claude to ting, den ellers ikke har: <strong>præcis kalorie-matematik</strong> og <strong>hukommelse på tværs af dage</strong>. Du logger mad, motion og vægt ved at skrive helt almindeligt til Claude — Claude estimerer makroerne og kalder Nettoday i baggrunden, som holder styr på regnestykket og gemmer det.</p>
+      <p>Der er <strong>ingen app at hente</strong> og ingen tabeller at udfylde i hånden. Alt foregår i dine egne Claude-samtaler. Det eneste, du opretter, er en gratis adgang til serveren (trin 1).</p>
+      <p><strong>Privatliv:</strong> dine data er adskilt fra andre brugeres — ingen andre testere kan se dem. De gemmes hos Simon (i en AWS-database) under et <strong>pseudonym-id</strong>, ikke dit navn, og han kan som ejer tilgå dem til support og forbedring af systemet. Del derfor ikke noget, du vil holde helt privat.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Setup -->
+  <section id="opsaet">
+    <h2>Opsætning — tre trin, ca. 5 minutter</h2>
+
+    <h2><span class="step-num">1</span> Tilføj Nettoday-connectoren i Claude</h2>
+    <div class="card">
+      <p>Åbn <strong>Claude</strong> (claude.ai i browseren eller desktop-appen) → <strong>Settings → Connectors</strong> (hedder også <em>Integrations</em> eller <em>Custom connectors</em>, afhængigt af din version). Vælg <em>Add custom connector</em> og indsæt denne URL:</p>
+      <div class="cmd-block" id="CONNECTOR_URL">https://nettoday.fastmcp.app/mcp</div>
+      <p>Når du tilføjer den, åbner der et login-vindue fra <strong>Horizon</strong> (systemet, der står for adgang). Har du ikke en konto, kan du <strong>oprette en gratis</strong> med din e-mail med det samme. Log ind — så er connectoren aktiv, og Claude kan bruge Nettoday.</p>
+    </div>
+    <div class="warn-box no-print">&#9888;&#65039; Virker URL'en eller login ikke? Skriv til Simon — adgangen styres via Horizon-organisationen, og han kan tjekke, at du er inviteret.</div>
+
+    <h2><span class="step-num">2</span> Kør onboarding i en ny samtale</h2>
+    <div class="card">
+      <p>Start en <strong>ny samtale</strong> og skriv:</p>
+      <div class="cmd-block you">load context</div>
+      <p>Første gang vil Claude sige, at du ikke har en profil endnu — det er helt normalt. Skriv så:</p>
+      <div class="cmd-block you">jeg vil gerne sætte min profil op</div>
+      <p>Claude guider dig roligt igennem — ét spørgsmål ad gangen: køn, fødselsdato, højde, vægt og dit mål (tabe / holde / tage på). Undervejs regner Nettoday dit <strong>BMR</strong> (hvilende forbrænding) og dit <strong>TDEE</strong> (samlede daglige forbrænding) ud og forklarer tallene.</p>
+    </div>
+    <div class="tip">Har du ikke lyst til at sætte det hele op? Sig <em>"jeg vil bare teste det"</em> — du kan springe vægt/mål over og stadig logge mad for at prøve det af.</div>
+
+    <h2><span class="step-num">3</span> Vælg en forbrændings-metode (TDEE)</h2>
+    <div class="card">
+      <p>Claude beder dig vælge, <strong>hvordan din daglige forbrænding skal beregnes</strong>. Der er fire metoder — vælg den, der passer dig (se næste afsnit for hjælp). Du kan altid skifte senere. Til sidst sætter I et <strong>kalorie-mål</strong> og et <strong>protein-mål</strong>, og du er klar til at logge.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- TDEE methods -->
+  <section id="metoder">
+    <h2>De fire TDEE-metoder — hvilken skal jeg vælge?</h2>
+    <div class="card">
+      <p>TDEE = hvor mange kalorier du forbrænder på en dag i alt. Vælg <strong>én</strong> metode. Er du i tvivl, så start med den første — du kan altid opgradere.</p>
+      <div class="methods">
+        <div class="method">
+          <div class="mname">tdee_given <span class="mtag">— enklest</span></div>
+          <p>Du kender allerede dit TDEE (fx fra et ur eller en tidligere udregning) og indtaster det bare. Perfekt til at komme hurtigt i gang.</p>
+        </div>
+        <div class="method">
+          <div class="mname">pal <span class="mtag">— aktivitetsfaktor</span></div>
+          <p>Claude spørger om dit job, hvor mange gange du træner om ugen osv., og ganger din hvileforbrænding med en faktor (1,2–1,9). Træning er <strong>bagt ind</strong> i tallet — du logger den ikke separat.</p>
+        </div>
+        <div class="method">
+          <div class="mname">steps <span class="mtag">— skridt-baseret (det Simon selv bruger)</span></div>
+          <p>Ét fast "arbejds-TDEE" der inkluderer dine normale skridt. Skridt <strong>ud over</strong> din baseline giver ekstra forbrænding (~0,03 kcal pr. skridt), og træning logges separat og trækkes fra netto. <strong>Det er metoden Simon kører med</strong> (han logger fx ~14.000 skridt om dagen). Mest præcis, hvis dine dage svinger meget i aktivitet.</p>
+        </div>
+        <div class="method">
+          <div class="mname">raw <span class="mtag">— alt logges</span></div>
+          <p>TDEE = BMR × 1,1. <strong>Al</strong> bevægelse — også gåture og skridt — logges som motion. Mest arbejde, men fuld kontrol.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tip"><strong>Anbefaling:</strong> kender du dit TDEE? Brug <code>tdee_given</code>. Vil du have det "sat og glemt"? Brug <code>pal</code>. Går du meget og varierende og vil have det præcist? Brug <code>steps</code>.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Feedback (most important for testers) -->
+  <section id="feedback">
+    <h2>📣 Det vigtigste: send feedback</h2>
+    <div class="warn-box" style="color:var(--text);">
+      Du er en af de <strong>første testere</strong>. Det mest værdifulde, du kan gøre, er at sige til, når noget er forkert eller kunne være bedre. Det tager 10 sekunder og gør systemet bedre for alle.
+    </div>
+    <div class="card">
+      <p>Er du uenig i et estimat, eller mangler du en funktion, så <strong>skriv det til Claude og bed den sende det videre</strong>. Du behøver ikke et særligt format — bare sig din mening og bed den "skrive feedbacken videre":</p>
+      <div class="cmd-block you">Jeg synes disse kalorietal var for lave — kan du ikke sætte dem højere? Og skriv denne feedback videre.</div>
+      <div class="cmd-block you">send feedback: det ville være fedt at kunne logge vand</div>
+      <div class="cmd-block you">feedback: tabellen er svær at læse på mobil</div>
+      <p>Feedbacken gemmes automatisk og kategoriseres (forkert estimat, fejl, ønske, brugeroplevelse), så Simon kan se den og rette tingene. <strong>Intet er for småt</strong> — også "det her var forvirrende" hjælper.</p>
+    </div>
+    <div class="tip"><strong>Vigtigt:</strong> hvis et tal ser forkert ud, så sig det med det samme — Claude regner gerne om mere konservativt. Det er bedre at justere undervejs end at logge noget, du ikke tror på.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Daily use -->
+  <section id="dagligt">
+    <h2>Sådan bruger du den i hverdagen</h2>
+    <div class="card">
+      <p>Den vigtigste pointe: <strong>du skriver bare almindeligt dansk.</strong> Du behøver ikke huske kommandoer eller værktøjsnavne — fortæl Claude hvad du har spist eller lavet, så klarer den resten.</p>
+
+      <h3>Sig til Claude, at Nettoday skal bruges</h3>
+      <p>I starten af en ny samtale skal Claude lige vide, at den skal bruge Nettoday. Det enkleste er at <strong>starte din besked med "Nettoday:"</strong> — eller bare nævne det:</p>
+      <div class="cmd-block you">Nettoday: jeg har lige spist morgenmad</div>
+      <div class="cmd-block you">brug Nettoday i dag — jeg vil logge mine måltider</div>
+      <p>Vil du være sikker på, at Claude har dine tal og præferencer med fra start, kan du også sige <code>load context</code> — så henter den din profil og dagens status. (I lange samtaler sker det af sig selv.)</p>
+      <div class="tip"><strong>Du behøver ikke holde dig til én samtale.</strong> Din dag gemmes på serveren, ikke i chatten — du kan logge morgenmad i én samtale og aftensmad i en helt anden (eller fra en anden enhed), og det lander på samme dag. Husk bare at sige <code>Nettoday:</code> (eller "brug Nettoday") i starten af hver ny samtale, så Claude ved, at den skal hente og opdatere din dag.</div>
+
+      <h3>Vej dig (valgfrit)</h3>
+      <div class="cmd-block you">jeg vejer 74,2 kg i dag</div>
+      <p>Morgenvejning er valgfrit, men giver dig en vægt-trend over tid.</p>
+
+      <h3>Log mad, efterhånden som du spiser</h3>
+      <div class="cmd-block you">jeg har spist en skyr med bær og honning til morgenmad</div>
+      <div class="cmd-block you">frokost: kylling, ris og en kop broccoli — cirka 350 g i alt</div>
+      <p>For sammensatte måltider laver Claude først en <strong>komponent-tabel</strong> (hver ingrediens for sig — også olie og dressing), spørger <em>"ser det rigtigt ud?"</em>, og logger først på dit "ja". Enkle ting (banan, shake) ryger direkte ind.</p>
+      <p>Du kan også <strong>sende et billede</strong> af din mad eller en varedeklaration — Claude læser det og estimerer derfra.</p>
+
+      <h3>Log motion og skridt</h3>
+      <div class="cmd-block you">jeg løb 5 km i 28 minutter</div>
+      <div class="cmd-block you">17.500 skridt i dag</div>
+      <p>Motion vises som negative kalorier og trækkes fra dit netto. (Skridt tæller kun, hvis du bruger <code>steps</code>-metoden.)</p>
+
+      <h3>Tjek status når som helst</h3>
+      <div class="cmd-block you">hvad er min status i dag?</div>
+      <p>Claude viser hele dagstabellen: mad, motion, netto og hvor meget du har <strong>tilbage</strong> til dit mål — i kalorier og protein.</p>
+
+      <h3>Luk dagen</h3>
+      <div class="cmd-block you">luk dagen</div>
+      <div class="cmd-block you">luk dagen — sov dårligt og var lidt øm</div>
+      <p>Når dagen er slut, kan du bede Claude lukke den. Den gemmes i din journal og indgår i dine trends. Du kan tilføje en note (søvn, humør, "tung træningsdag"), som følger med. <strong>Glemmer du det, lukkes dagen automatisk</strong>, næste gang du logger noget på en ny dato — så du taber ikke data, men der sker ikke noget af sig selv ved midnat, hvis du holder pause i flere dage.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Example table -->
+  <section id="tabel">
+    <h2>Sådan ser en dagstabel ud</h2>
+    <div class="card">
+      <p>Alt samles i én tabel. Mad øverst, så <strong>Mad total</strong>, så motion (negativt), så <strong>Net</strong> og <strong>Tilbage</strong> i forhold til dit mål:</p>
+      <table class="daytable">
+        <thead>
+          <tr><th>Post</th><th>kcal</th><th>P</th><th>K</th><th>F</th><th>Fib</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Skyr med bær &amp; honning</td><td>320</td><td>30</td><td>28</td><td>6</td><td>4</td></tr>
+          <tr><td>Frokost: kylling &amp; ris</td><td>650</td><td>45</td><td>70</td><td>18</td><td>5</td></tr>
+          <tr><td>Proteinshake</td><td>160</td><td>30</td><td>5</td><td>2</td><td>1</td></tr>
+          <tr class="total"><td>Mad total</td><td>1.130</td><td>105</td><td>103</td><td>26</td><td>10</td></tr>
+          <tr class="motion"><td>Løb 5 km</td><td>−350</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr class="net"><td>Net</td><td>780</td><td>105</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr class="left"><td>Tilbage (mål 1.800 / 160 g)</td><td>1.020</td><td>55</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <p class="caption">P = protein, K = kulhydrat, F = fedt, Fib = fibre (gram). Tusind-tal med punktum, decimaler med komma (dansk format). Tilbage viser kun kalorier og protein vs. dagens mål.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Advice -->
+  <section id="raad">
+    <h2>Gode råd, der gør den bedre</h2>
+    <div class="card">
+      <ul>
+        <li><strong>Log med det samme.</strong> Skriv måltidet, mens du husker det — Claude viser den opdaterede tabel hver gang, så du altid ved, hvor du står.</li>
+        <li><strong>Giv detaljer ved usikkerhed.</strong> "Cirka 200 g kylling, en spsk olie" giver et bedre estimat end "noget kylling". Jo mere præcist input, jo bedre matematik.</li>
+        <li><strong>Vær skeptisk — det må du gerne.</strong> Synes du et estimat er for højt, så sig det. Claude regner om mere konservativt i stedet for at forsvare tallet.</li>
+        <li><strong>Halve portioner</strong> logges som spist, fx "½ proteinshake" to gange.</li>
+        <li><strong>Gem standardmåltider.</strong> Har du en fast morgenmad eller shake, så bed Claude gemme den. Næste gang siger du bare <em>"log min skyr-morgenmad"</em> — ingen genberegning.</li>
+        <li><strong>Glemt at logge i går?</strong> Skriv datoen med: <em>"log 400 kcal havregrød til i går"</em>. Det skrives ind på den rigtige dag.</li>
+        <li><strong>Følg din trend, ikke enkeltdage.</strong> Spørg <em>"vis min vægt-trend de sidste 14 dage"</em> eller <em>"hvad har mit gennemsnitlige netto været på den seneste uge?"</em></li>
+        <li><strong>Ret fejl frit.</strong> "Slet frokosten, den var forkert" — Claude fjerner posten og opdaterer tabellen.</li>
+        <li><strong>Korrektioner huskes.</strong> Ændrer du format eller en præference én gang, følger Claude den fremover.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Tools reference -->
+  <section id="tools">
+    <h2>Hvad Claude kan gøre via Nettoday</h2>
+    <p style="color:var(--muted);font-size:0.92rem;"><strong style="color:var(--text);">Du skal ikke tænke på listen nedenfor</strong> — du skriver bare naturligt ("jeg spiste…", "jeg løb…", "luk dagen"), og Claude vælger selv det rigtige værktøj bag kulissen. Den er kun her, så du ved, hvad der er muligt:</p>
+
+    <div class="group-label">Logning</div>
+    <div class="tool-grid">
+      <div class="tool-card"><div class="tool-name">log_meal</div><div class="tool-desc">Logger et måltid med kalorier og makroer (og gemmer sammensatte måltider til genbrug).</div></div>
+      <div class="tool-card"><div class="tool-name">log_meal_from_library</div><div class="tool-desc">Gen-logger et gemt måltid efter navn, skaleret efter portioner.</div></div>
+      <div class="tool-card"><div class="tool-name">log_exercise</div><div class="tool-desc">Logger motion som negative kalorier (trækkes fra netto).</div></div>
+      <div class="tool-card"><div class="tool-name">log_steps</div><div class="tool-desc">Registrerer skridt og beregner ekstra forbrænding over din baseline.</div></div>
+      <div class="tool-card"><div class="tool-name">log_weight</div><div class="tool-desc">Logger vægt (og evt. fedt% / muskelmasse).</div></div>
+      <div class="tool-card"><div class="tool-name">log_session</div><div class="tool-desc">Noterer hvordan en træning føltes (RPE, "tung/frisk") — påvirker ikke kalorier.</div></div>
+    </div>
+
+    <div class="group-label">Overblik &amp; historik</div>
+    <div class="tool-grid">
+      <div class="tool-card"><div class="tool-name">load_context</div><div class="tool-desc">Henter din profil, dine regler og dagens tal. Kør den først i nye samtaler.</div></div>
+      <div class="tool-card"><div class="tool-name">get_day_summary</div><div class="tool-desc">Viser dagens samlede tabel: mad, motion, netto og tilbage.</div></div>
+      <div class="tool-card"><div class="tool-name">get_trend</div><div class="tool-desc">Trend over dage for vægt, netto-kalorier, protein eller fedt%.</div></div>
+      <div class="tool-card"><div class="tool-name">close_day</div><div class="tool-desc">Lukker dagen til journalen (sker også automatisk ved ny dato).</div></div>
+      <div class="tool-card"><div class="tool-name">query_journal</div><div class="tool-desc">Svarer på analytiske spørgsmål om din egen historik.</div></div>
+      <div class="tool-card"><div class="tool-name">delete_entry</div><div class="tool-desc">Fjerner en forkert post fra dagen og regner om.</div></div>
+    </div>
+
+    <div class="group-label">Profil, bibliotek &amp; feedback</div>
+    <div class="tool-grid">
+      <div class="tool-card"><div class="tool-name">save_profile / update_profile</div><div class="tool-desc">Opretter eller opdaterer din profil og genberegner BMR/TDEE/mål.</div></div>
+      <div class="tool-card"><div class="tool-name">save_meal</div><div class="tool-desc">Gemmer et standardmåltid til biblioteket uden at logge det.</div></div>
+      <div class="tool-card"><div class="tool-name">search_meals / search_ingredients</div><div class="tool-desc">Søger i dine gemte måltider og ingredienser.</div></div>
+      <div class="tool-card"><div class="tool-name">get_memory / update_memory</div><div class="tool-desc">Læser/justerer dine personlige regler og præferencer.</div></div>
+      <div class="tool-card"><div class="tool-name">submit_feedback</div><div class="tool-desc">Sender feedback om forkerte estimater, fejl eller ønsker.</div></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- FAQ -->
+  <section id="faq">
+    <h2>Ofte stillede spørgsmål</h2>
+    <div class="card">
+      <p><strong>Skal jeg starte hver samtale ens?</strong><br>
+      Bare giv Claude besked om, at Nettoday skal bruges — nemmest ved at starte beskeden med <code>Nettoday:</code> eller skrive <code>load context</code>. Så har den din profil og dine præferencer. I lange samtaler henter den det selv.</p>
+    </div>
+    <div class="card">
+      <p><strong>Kan jeg logge noget fra i går?</strong><br>
+      Ja — skriv bare datoen med, fx <em>"log 400 kcal havregrød til i går (2026-06-17)"</em>. Claude sætter datoen automatisk, og det skrives ind på den rigtige dag.</p>
+    </div>
+    <div class="card">
+      <p><strong>Hvad sker der med mine data?</strong><br>
+      De ligger i en database (DynamoDB) på Simons AWS-konto, opdelt efter dit eget bruger-ID. Andre brugere kan ikke se dine data, og din adgangskode håndteres af login-systemet — hverken appen eller Simon ser den.</p>
+    </div>
+    <div class="card">
+      <p><strong>Behøver jeg forstå makroer og TDEE?</strong><br>
+      Nej. Sig bare hvad du har spist og dit mål — Claude og Nettoday klarer matematikken. Vil du dybere ned, så spørg; vil du holde det simpelt, så lad være.</p>
+    </div>
+    <div class="card">
+      <p><strong>Noget virker ikke — hvad gør jeg?</strong><br>
+      Brug <code>submit_feedback</code> direkte i Claude: <em>"send feedback: [din besked]"</em> — fejl kategoriseres og gemmes automatisk. Eller skriv til Simon.</p>
+    </div>
+  </section>
+
+  <footer>
+    Nettoday &mdash; bygget af Simon &bull; Drevet af Claude + FastMCP Cloud<br>
+    Spørgsmål eller fejl? Brug <code>submit_feedback</code> i Claude, eller skriv til Simon.
+  </footer>
+
+</div>
+</body>
+</html>
